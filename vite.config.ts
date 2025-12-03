@@ -16,12 +16,3 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
-
-export default defineConfig(({ mode }) => ({
-  base: '/your-repo-name/',  // Replace with your actual repo name
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  // ... rest of config
-}));
