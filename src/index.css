@@ -148,3 +148,11 @@
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+@layer base {
+  /* ...the rest of your base...*/
+  #lovable-badge {
+    display: none !important;
+  }
+}
+  
