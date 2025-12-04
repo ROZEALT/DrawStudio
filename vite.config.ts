@@ -1,16 +1,17 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
 
 export default defineConfig({
-  plugins: [react()],               // that's all you need!
+  base: '/DrawStudio/', 
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
-    host: '::',
+    host: "::",
     port: 8080,
   },
 });
