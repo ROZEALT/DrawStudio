@@ -5,6 +5,7 @@ import { ColorPicker } from './ColorPicker';
 import { BrushSettings } from './BrushSettings';
 import { LayersPanel } from './LayersPanel';
 import { ZoomControl } from './ZoomControl';
+import { PresetsPanel } from './PresetsPanel';
 import { useDrawingCanvas } from '@/hooks/useDrawingCanvas';
 import { BrushType, BrushSettings as BrushSettingsType } from '@/types/drawing';
 import { toast } from 'sonner';
@@ -37,9 +38,15 @@ export function DrawingApp() {
     endStroke,
     clearLayer,
     exportCanvas,
+    stampPreset,
     undo,
     redo,
   } = useDrawingCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const handleApplyPreset = useCallback((type: 'male' | 'female') => {
+    stampPreset(type);
+    toast.success(`${type === 'male' ? 'Male' : 'Female'} mannequin added to layer`);
+  }, [stampPreset]);
 
   const handleBrushChange = useCallback((type: BrushType) => {
     setBrush(prev => ({ ...prev, type }));
@@ -171,6 +178,7 @@ export function DrawingApp() {
           settings={brush}
           onChange={handleBrushSettingsChange}
         />
+        <PresetsPanel onApplyPreset={handleApplyPreset} />
         <LayersPanel
           layers={layers}
           activeLayerId={activeLayerId}
