@@ -255,6 +255,106 @@ export function useDrawingCanvas(width: number, height: number) {
     }
   }, [layers, width, height, saveToHistory]);
 
+  const stampPreset = useCallback((type: 'male' | 'female') => {
+    const layer = getActiveLayer();
+    if (!layer || layer.locked || !layer.canvas) return;
+
+    const ctx = layer.canvas.getContext('2d');
+    if (!ctx) return;
+
+    saveToHistory();
+
+    // Center the mannequin on canvas
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const scale = Math.min(width, height) * 0.4;
+
+    ctx.save();
+    ctx.strokeStyle = '#666666';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Draw mannequin based on type
+    const drawMannequin = (isMale: boolean) => {
+      const headRadius = scale * 0.07;
+      const shoulderWidth = isMale ? scale * 0.3 : scale * 0.22;
+      const hipWidth = isMale ? scale * 0.2 : scale * 0.25;
+      const torsoLength = scale * 0.29;
+      const armLength = scale * 0.25;
+      const legLength = scale * 0.35;
+      const lowerLegLength = scale * 0.2;
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(centerX, centerY - scale * 0.4, headRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Neck to torso
+      const neckY = centerY - scale * 0.4 + headRadius;
+      const shoulderY = neckY + scale * 0.065;
+      const torsoEndY = shoulderY + torsoLength;
+
+      // Spine
+      ctx.beginPath();
+      ctx.moveTo(centerX, neckY);
+      ctx.lineTo(centerX, torsoEndY);
+      ctx.stroke();
+
+      // Shoulders
+      ctx.beginPath();
+      ctx.moveTo(centerX - shoulderWidth, shoulderY);
+      ctx.lineTo(centerX + shoulderWidth, shoulderY);
+      ctx.stroke();
+
+      // Arms
+      ctx.beginPath();
+      ctx.moveTo(centerX - shoulderWidth, shoulderY);
+      ctx.lineTo(centerX - shoulderWidth - armLength * 0.3, shoulderY + armLength);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX + shoulderWidth, shoulderY);
+      ctx.lineTo(centerX + shoulderWidth + armLength * 0.3, shoulderY + armLength);
+      ctx.stroke();
+
+      // Hips
+      ctx.beginPath();
+      ctx.moveTo(centerX - hipWidth, torsoEndY);
+      ctx.lineTo(centerX + hipWidth, torsoEndY);
+      ctx.stroke();
+
+      // Hip curve for female
+      if (!isMale) {
+        ctx.beginPath();
+        ctx.moveTo(centerX - hipWidth * 0.8, torsoEndY - scale * 0.05);
+        ctx.quadraticCurveTo(centerX, torsoEndY + scale * 0.05, centerX + hipWidth * 0.8, torsoEndY - scale * 0.05);
+        ctx.stroke();
+      }
+
+      // Legs
+      const kneeY = torsoEndY + legLength;
+      const footY = kneeY + lowerLegLength;
+
+      // Left leg
+      ctx.beginPath();
+      ctx.moveTo(centerX - hipWidth, torsoEndY);
+      ctx.lineTo(centerX - hipWidth * 0.8, kneeY);
+      ctx.lineTo(centerX - hipWidth * 0.75, footY);
+      ctx.stroke();
+
+      // Right leg
+      ctx.beginPath();
+      ctx.moveTo(centerX + hipWidth, torsoEndY);
+      ctx.lineTo(centerX + hipWidth * 0.8, kneeY);
+      ctx.lineTo(centerX + hipWidth * 0.75, footY);
+      ctx.stroke();
+    };
+
+    drawMannequin(type === 'male');
+    ctx.restore();
+  }, [getActiveLayer, width, height, saveToHistory]);
+
   const exportCanvas = useCallback((format: 'png' | 'jpeg' = 'png') => {
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = width;
@@ -295,6 +395,7 @@ export function useDrawingCanvas(width: number, height: number) {
     endStroke,
     clearLayer,
     exportCanvas,
+    stampPreset,
     undo,
     redo,
   };
